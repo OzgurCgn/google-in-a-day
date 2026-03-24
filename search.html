@@ -7,11 +7,20 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
+  <script>
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+
   <div class="header">
     <h1>
         <span class="google-colored"><span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span></span>
         <span class="in-a-day">in a Day</span>
     </h1>
+    <div class="theme-toggle-container">
+      <button id="themeToggleBtn">Toggle Dark Mode</button>
+    </div>
   </div>
 
   <div class="nav-tabs-container">
@@ -49,20 +58,20 @@
       const container = document.getElementById('searchResults');
 
       if (!data.results || data.results.length === 0) {
-        container.innerHTML = '<div style="padding: 20px; text-align: center; background: #f8f9fa; border: 1px solid #dadce0; border-radius: 4px; color: #5f6368;">No indexed content found for this search.</div>';
+        container.innerHTML = '<div style="padding: 20px; text-align: center; background: var(--stat-box-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--nav-text);">No indexed content found for this search.</div>';
         return;
       }
 
       container.innerHTML = `
-        <p style="margin-bottom: 15px; color: #5f6368; font-size: 0.95rem;">Found <strong>${data.count}</strong> relevant results</p>
+        <p style="margin-bottom: 15px; color: var(--nav-text); font-size: 0.95rem;">Found <strong>${data.count}</strong> relevant results</p>
         ${data.results.map(r => `
           <div class="result-item">
             <div class="flex-between" style="margin-bottom: 8px;">
               <a href="${r.relevant_url}" target="_blank" class="link-title">${r.relevant_url}</a>
               <span class="badge completed" style="font-weight: bold;">Score: ${r.relevance_score}</span>
             </div>
-            <div style="font-size: 0.9rem; color: #5f6368; display: flex; flex-direction: column; gap: 4px;">
-              <span><strong>Origin:</strong> <a href="${r.origin_url}" target="_blank" style="color: #5f6368;">${r.origin_url}</a></span>
+            <div style="font-size: 0.9rem; color: var(--nav-text); display: flex; flex-direction: column; gap: 4px;">
+              <span><strong>Origin:</strong> <a href="${r.origin_url}" target="_blank" style="color: var(--nav-text);">${r.origin_url}</a></span>
               <span><strong>Depth:</strong> ${r.depth}</span>
             </div>
           </div>
@@ -81,6 +90,28 @@
         executeSearch(q);
       } else {
         alert("Please enter a search term first.");
+      }
+    });
+  </script>
+
+  <script>
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    
+    if (document.body.classList.contains('dark-mode')) {
+      themeToggleBtn.innerText = "Light Mode";
+    } else {
+      themeToggleBtn.innerText = "Dark Mode"; 
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      
+      if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('theme', 'dark');
+        themeToggleBtn.innerText = "Light Mode";
+      } else {
+        localStorage.setItem('theme', 'light');
+        themeToggleBtn.innerText = "Dark Mode";
       }
     });
   </script>
