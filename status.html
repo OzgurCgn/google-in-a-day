@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google in a Day - 📊 System Status</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>
+        <span class="google-colored"><span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span></span>
+        <span class="in-a-day">in a Day</span>
+    </h1>
+  </div>
+
+  <div class="nav-tabs-container">
+    <ul class="nav-tabs">
+      <li><a href="/crawler.html">🕷️ Crawler</a></li>
+      <li><a href="/search.html">🔍 Search</a></li>
+      <li><a href="/status.html" class="active">📊 Status</a></li>
+    </ul>
+  </div>
+
+  <div class="container">
+    <div class="page-layout split">
+      
+      <section class="card">
+        <div class="flex-between" style="border-bottom: 1px solid #e8eaed; padding-bottom: 12px; margin-bottom: 25px;">
+          <h2 style="border: none; margin: 0; padding: 0;">Crawler Status</h2>
+          <button id="refreshJobsBtn" class="outline" style="width: auto; padding: 8px 15px; font-size: 0.9rem;">🔄 Refresh List</button>
+        </div>
+        <div id="jobsList" style="max-height: 500px; overflow-y: auto;"></div>
+      </section>
+
+      <section class="card" id="telemetrySection" style="position: sticky; top: 20px;">
+        <h2>📊 Real-time Logs</h2>
+        <div id="statusPanel">
+          <p style="text-align: center; color: #5f6368; padding: 50px 0;">Select a crawler job from the list to view its real-time logs.</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedJobId = null;
+    let pollingTimer = null;
+
+    function getStatusBadge(status) {
+      return `<span class="badge ${status.toLowerCase()}">${status}</span>`;
+    }
+
+    async function refreshJobs() {
+      const res = await fetch('/api/jobs');
+      const data = await res.json();
+      const jobsList = document.getElementById('jobsList');
+
+      if (!data.jobs || data.jobs.length === 0) {
+        jobsList.innerHTML = '<p style="color: #5f6368;">No crawler jobs registered yet.</p>';
+        return;
+      }
+
+      jobsList.innerHTML = data.jobs.map(job => `
+        <div class="job-item">
+          <div class="flex-between">
+            <strong style="font-family: monospace; font-size: 1.1rem; color: #202124;">${job.job_id}</strong>
+            ${getStatusBadge(job.status)}
+          </div>
+          <div style="font-size: 0.95rem; margin-bottom: 10px; word-break: break-all;">
+            <strong>Target:</strong> <span style="color: #1a73e8;">${job.origin_url}</span>
+          </div>
+          <div style="font-size: 0.9rem; color: #5f6368; margin-bottom: 12px;">
+             URLs Visited: <strong>${job.processed_count}</strong> | Discovered: <strong>${job.discovered_count}</strong>
+          </div>
+          <button class="outline" onclick="selectJob('${job.job_id}')" style="width: 100%;">📊 View Real-time Logs</button>
+        </div>
+      `).join('');
+    }
+
+    async function fetchJobStatus(jobId) {
+      const res = await fetch(`/api/status/${jobId}`);
+      const data = await res.json();
+      const panel = document.getElementById('statusPanel');
+
+      if (data.error) {
+        panel.innerHTML = `<p style="color: red;">${data.error}</p>`;
+        return;
+      }
+
+      panel.innerHTML = `
+        <div class="flex-between" style="margin-bottom: 15px; border-bottom: 1px solid #e8eaed; padding-bottom: 10px;">
+          <strong style="font-family: monospace; font-size: 1.25rem; color: #1a73e8;">${data.job_id}</strong>
+          ${getStatusBadge(data.status)}
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div class="stat-label">URLs Visited</div>
+            <div class="stat-value text-primary">${data.processed_count}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Queue Depth</div>
+            <div class="stat-value">${data.queue_depth} <small style="font-size: 1rem; font-weight: normal; color: #5f6368;">/ ${data.queue_limit}</small></div>
+          </div>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 500; color: #202124; margin-bottom: 10px;">Live Crawler Logs</h3>
+        <div class="logs" id="terminalLog">
+          ${(data.logs || []).slice(-50).map(log => `
+            <div class="log-line">
+              <span class="log-time">[${new Date(log.ts * 1000).toLocaleTimeString()}]</span>
+              <span class="log-${log.level}">${log.level}</span>
+              <span style="margin-left: 8px;">${log.message}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      const terminal = document.getElementById('terminalLog');
+      if(terminal) terminal.scrollTop = terminal.scrollHeight;
+
+      if (data.status === 'COMPLETED' || data.status === 'FAILED') {
+        clearInterval(pollingTimer);
+        pollingTimer = null;
+      }
+    }
+
+    function selectJob(jobId) {
+      selectedJobId = jobId;
+      fetchJobStatus(jobId);
+      if (pollingTimer) clearInterval(pollingTimer);
+      pollingTimer = setInterval(() => {
+        if (selectedJobId) fetchJobStatus(selectedJobId);
+      }, 1000); 
+    }
+
+    document.getElementById('refreshJobsBtn').addEventListener('click', refreshJobs);
+    refreshJobs();
+    setInterval(() => { refreshJobs(); }, 5000);
+  </script>
+</body>
+</html>

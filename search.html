@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google in a Day - 🔍 Search Indexed Pages</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>
+        <span class="google-colored"><span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span></span>
+        <span class="in-a-day">in a Day</span>
+    </h1>
+  </div>
+
+  <div class="nav-tabs-container">
+    <ul class="nav-tabs">
+      <li><a href="/crawler.html">🕷️ Crawler</a></li>
+      <li><a href="/search.html" class="active">🔍 Search</a></li>
+      <li><a href="/status.html">📊 Status</a></li>
+    </ul>
+  </div>
+
+  <div class="container">
+    <div class="page-layout">
+      <section class="card">
+        <h2>Search Indexer</h2>
+        <form id="searchForm">
+          <div class="form-group">
+            <label>Search Terms</label>
+            <input type="text" id="query" placeholder="Enter keywords to search..." required />
+          </div>
+          <div class="form-row">
+            <button type="submit">🔍 Search</button>
+            <button type="button" class="success" id="luckyBtn">🍀 I'm Feeling Lucky</button>
+          </div>
+        </form>
+        <div id="searchResults" style="margin-top: 25px;"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    async function executeSearch(queryStr) {
+      if (!queryStr) return;
+      const res = await fetch(`/api/search?q=${encodeURIComponent(queryStr)}&limit=50`);
+      const data = await res.json();
+      const container = document.getElementById('searchResults');
+
+      if (!data.results || data.results.length === 0) {
+        container.innerHTML = '<div style="padding: 20px; text-align: center; background: #f8f9fa; border: 1px solid #dadce0; border-radius: 4px; color: #5f6368;">No indexed content found for this search.</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <p style="margin-bottom: 15px; color: #5f6368; font-size: 0.95rem;">Found <strong>${data.count}</strong> relevant results</p>
+        ${data.results.map(r => `
+          <div class="result-item">
+            <div class="flex-between" style="margin-bottom: 8px;">
+              <a href="${r.relevant_url}" target="_blank" class="link-title">${r.relevant_url}</a>
+              <span class="badge completed" style="font-weight: bold;">Score: ${r.relevance_score}</span>
+            </div>
+            <div style="font-size: 0.9rem; color: #5f6368; display: flex; flex-direction: column; gap: 4px;">
+              <span><strong>Origin:</strong> <a href="${r.origin_url}" target="_blank" style="color: #5f6368;">${r.origin_url}</a></span>
+              <span><strong>Depth:</strong> ${r.depth}</span>
+            </div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    document.getElementById('searchForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      executeSearch(document.getElementById('query').value.trim());
+    });
+
+    document.getElementById('luckyBtn').addEventListener('click', () => {
+      const q = document.getElementById('query').value.trim();
+      if(q) {
+        executeSearch(q);
+      } else {
+        alert("Please enter a search term first.");
+      }
+    });
+  </script>
+</body>
+</html>

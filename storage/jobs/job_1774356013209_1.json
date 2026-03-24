@@ -1,0 +1,44 @@
+{
+  "job_id": "job_1774356013209_1",
+  "origin_url": "http://neverssl.com/",
+  "max_depth": 1,
+  "pages_per_second": 1.0,
+  "queue_limit": 100,
+  "worker_count": 2,
+  "status": "COMPLETED",
+  "created_at": 1774356013.2098262,
+  "started_at": 1774356013.2108252,
+  "finished_at": 1774356022.6740623,
+  "processed_count": 3,
+  "discovered_count": 2,
+  "queue_depth": 0,
+  "backpressure_active": false,
+  "last_error": null,
+  "logs": [
+    {
+      "ts": 1774356013.2127738,
+      "level": "INFO",
+      "message": "Started crawl from http://neverssl.com/"
+    },
+    {
+      "ts": 1774356020.8294277,
+      "level": "INFO",
+      "message": "Indexed http://neverssl.com/ at depth 0"
+    },
+    {
+      "ts": 1774356021.7416735,
+      "level": "INFO",
+      "message": "Indexed https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security at depth 1"
+    },
+    {
+      "ts": 1774356022.6740623,
+      "level": "INFO",
+      "message": "Indexed https://twitter.com/neverssl at depth 1"
+    },
+    {
+      "ts": 1774356022.6740623,
+      "level": "INFO",
+      "message": "Crawl completed"
+    }
+  ]
+}

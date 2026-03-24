@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google in a Day - 🕷️ Crawler Management</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>
+        <span class="google-colored"><span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span></span>
+        <span class="in-a-day">in a Day</span>
+    </h1>
+  </div>
+
+  <div class="nav-tabs-container">
+    <ul class="nav-tabs">
+      <li><a href="/crawler.html" class="active">🕷️ Crawler</a></li>
+      <li><a href="/search.html">🔍 Search</a></li>
+      <li><a href="/status.html">📊 Status</a></li>
+    </ul>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-container">
+      <div class="stat-item"><span class="label">URLs Visited:</span> <span class="value" id="stat_urls">0</span></div>
+      <div class="stat-item"><span class="label">Words in DB:</span> <span class="value" id="stat_words">0</span></div>
+      <div class="stat-item"><span class="label">🕷️ Active Crawlers:</span> <span class="value active-badge" id="stat_active">0</span></div>
+      <div class="stat-item"><span class="label">Total Created:</span> <span class="value" id="stat_total">0</span></div>
+      <div class="stats-actions">
+        <button class="btn-clear" id="clearDataBtn">🗑️ Clear</button>
+        <button class="btn-refresh" id="refreshStatsBtn">🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-layout">
+      <section class="card">
+        <h2>Start a New Crawler Job</h2>
+        <form id="crawlForm">
+          <div class="form-group">
+            <label>Origin URL</label>
+            <input type="url" id="origin_url" placeholder="https://www.wikipedia.org/" required />
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Max Depth</label>
+              <input type="number" id="max_depth" min="0" max="10" value="1" />
+            </div>
+            <div class="form-group">
+              <label>Hit Rate (req/sec)</label>
+              <input type="number" id="pages_per_second" min="0.1" step="0.1" value="2.0" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Queue Capacity</label>
+              <input type="number" id="queue_limit" min="100" max="5000" value="1000" />
+            </div>
+            <div class="form-group">
+              <label>Worker Threads</label>
+              <input type="number" id="worker_count" min="1" max="50" value="5" />
+            </div>
+          </div>
+
+          <button type="submit" style="margin-top: 10px;">🕷️ Start Crawler</button>
+        </form>
+        <div id="crawlResponse"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats');
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('stat_urls').textContent = data.urls_visited;
+          document.getElementById('stat_words').textContent = data.words_in_db;
+          document.getElementById('stat_active').textContent = data.active_crawlers;
+          document.getElementById('stat_total').textContent = data.total_created;
+        }
+      } catch (e) { console.error("Stats error", e); }
+    }
+
+    document.getElementById('refreshStatsBtn').addEventListener('click', loadStats);
+    
+    document.getElementById('clearDataBtn').addEventListener('click', async () => {
+      if(confirm("All data (index and queue) will be deleted. Are you sure?")) {
+          try {
+              const res = await fetch('/api/clear', { method: 'POST' });
+              if (res.ok) {
+                  alert("Database and active jobs completely cleared!");
+                  loadStats();
+              }
+          } catch(e) { console.error("Clear error", e); }
+      }
+    });
+
+    loadStats();
+    setInterval(loadStats, 3000);
+
+    document.getElementById('crawlForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        origin_url: document.getElementById('origin_url').value.trim(),
+        max_depth: Number(document.getElementById('max_depth').value),
+        queue_limit: Number(document.getElementById('queue_limit').value),
+        worker_count: Number(document.getElementById('worker_count').value),
+        pages_per_second: Number(document.getElementById('pages_per_second').value),
+      };
+
+      const res = await fetch('/api/crawl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      const box = document.getElementById('crawlResponse');
+
+      if (!res.ok) {
+        box.innerHTML = `<p style="color: #EA4335; font-size: 1rem; margin-top: 15px;">❌ Error: ${data.error}</p>`;
+        return;
+      }
+
+      box.innerHTML = `<p style="color: #34A853; font-size: 1rem; margin-top: 15px;">✅ Crawler started: <strong>${data.job_id}</strong>. Go to Status tab to monitor.</p>`;
+      document.getElementById('origin_url').value = '';
+      loadStats(); 
+    });
+  </script>
+</body>
+</html>

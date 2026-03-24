@@ -1,0 +1,34 @@
+{
+  "job_id": "job_1774355573743_1",
+  "origin_url": "https://www.mozilla.org/en-US/privacy/",
+  "max_depth": 0,
+  "pages_per_second": 1.0,
+  "queue_limit": 100,
+  "worker_count": 1,
+  "status": "COMPLETED",
+  "created_at": 1774355573.7436156,
+  "started_at": 1774355573.744623,
+  "finished_at": 1774355574.444136,
+  "processed_count": 1,
+  "discovered_count": 0,
+  "queue_depth": 0,
+  "backpressure_active": false,
+  "last_error": null,
+  "logs": [
+    {
+      "ts": 1774355573.7466154,
+      "level": "INFO",
+      "message": "Started crawl from https://www.mozilla.org/en-US/privacy/"
+    },
+    {
+      "ts": 1774355574.442962,
+      "level": "INFO",
+      "message": "Indexed https://www.mozilla.org/en-US/privacy/ at depth 0"
+    },
+    {
+      "ts": 1774355574.444136,
+      "level": "INFO",
+      "message": "Crawl completed"
+    }
+  ]
+}

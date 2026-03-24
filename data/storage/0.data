@@ -1,0 +1,8 @@
+0din https://www.mozilla.org/en-US/privacy/ https://www.mozilla.org/en-US/privacy/ 0 1
+0din https://www.mozilla.org/en-US/privacy/websites/ https://www.mozilla.org/en-US/privacy/websites/ 0 1
+0 https://docs.python.org/3/ https://docs.python.org/3/ 0 3
+06 https://docs.python.org/3/ https://docs.python.org/3/ 0 1
+000 https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security http://neverssl.com/ 1 1
+0 https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security http://neverssl.com/ 1 5
+06 https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security http://neverssl.com/ 1 1
+05 https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security http://neverssl.com/ 1 1

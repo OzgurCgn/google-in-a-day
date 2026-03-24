@@ -1,0 +1,34 @@
+{
+  "job_id": "job_1774355602592_3",
+  "origin_url": "https://www.mozilla.org/en-US/about/legal/privacy/firefox/",
+  "max_depth": 0,
+  "pages_per_second": 1.0,
+  "queue_limit": 100,
+  "worker_count": 1,
+  "status": "COMPLETED",
+  "created_at": 1774355602.592936,
+  "started_at": 1774355602.592936,
+  "finished_at": 1774355603.0458174,
+  "processed_count": 0,
+  "discovered_count": 0,
+  "queue_depth": 0,
+  "backpressure_active": false,
+  "last_error": null,
+  "logs": [
+    {
+      "ts": 1774355602.592936,
+      "level": "INFO",
+      "message": "Started crawl from https://www.mozilla.org/en-US/about/legal/privacy/firefox/"
+    },
+    {
+      "ts": 1774355603.0303934,
+      "level": "ERROR",
+      "message": "Worker error: HTTP Error 404: Not Found"
+    },
+    {
+      "ts": 1774355603.0458174,
+      "level": "INFO",
+      "message": "Crawl completed"
+    }
+  ]
+}
