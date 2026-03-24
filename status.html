@@ -100,7 +100,10 @@
       panel.innerHTML = `
         <div class="flex-between" style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
           <strong style="font-family: monospace; font-size: 1.25rem; color: #1a73e8;">${data.job_id}</strong>
-          ${getStatusBadge(data.status)}
+          <div>
+            ${data.backpressure_active ? '<span class="badge queued" style="margin-right: 8px;">⚠️ BACK PRESSURE</span>' : ''}
+            ${getStatusBadge(data.status)}
+          </div>
         </div>
 
         <div class="stat-grid">
