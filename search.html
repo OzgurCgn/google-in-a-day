@@ -51,11 +51,16 @@
   </div>
 
   <script>
-    async function executeSearch(queryStr) {
+    async function executeSearch(queryStr, isLucky = false) {
       if (!queryStr) return;
       const res = await fetch(`/api/search?q=${encodeURIComponent(queryStr)}&limit=50`);
       const data = await res.json();
       const container = document.getElementById('searchResults');
+
+      if (isLucky && data.results && data.results.length > 0) {
+        window.open(data.results[0].relevant_url, '_blank');
+        return;
+      }
 
       if (!data.results || data.results.length === 0) {
         container.innerHTML = '<div style="padding: 20px; text-align: center; background: var(--stat-box-bg); border: 1px solid var(--border-color); border-radius: 4px; color: var(--nav-text);">No indexed content found for this search.</div>';
@@ -78,6 +83,20 @@
         `).join('')}
       `;
     }
+
+    document.getElementById('searchForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      executeSearch(document.getElementById('query').value.trim(), false);
+    });
+
+    document.getElementById('luckyBtn').addEventListener('click', () => {
+      const q = document.getElementById('query').value.trim();
+      if(q) {
+        executeSearch(q, true);
+      } else {
+        alert("Please enter a search term first.");
+      }
+    });
 
     document.getElementById('searchForm').addEventListener('submit', (e) => {
       e.preventDefault();
